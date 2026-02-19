@@ -1,6 +1,6 @@
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:2000'
-    : window.location.origin; // In production, it points to the same host
+    : 'https://justcall.onrender.com';
 let socket;
 let currentUser = null;
 let currentTargetRollNo = null;
