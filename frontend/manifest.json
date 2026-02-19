@@ -1,0 +1,16 @@
+{
+  "name": "JustCall",
+  "short_name": "JustCall",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "description": "Real-time voice calls using Roll Numbers",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3616/3616215.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
