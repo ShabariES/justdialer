@@ -9,9 +9,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from the frontend folder
+// Serve static files from the public folder inside backend
 const path = require('path');
-app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const server = http.createServer(app);
 const io = new Server(server, {

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JustCall | Modern voice calling</title>
+    <meta name="theme-color" content="#6366f1">
+    <meta name="description" content="Real-time voice calls using Roll Numbers. Fast, P2P, and easy to use.">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3616/3616215.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3616/3616215.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container" id="auth-container">
+        <!-- Login Screen -->
+        <div id="login-section" class="card fade-in">
+            <h1>JustCall</h1>
+            <p class="subtitle">Real-time voice, simplified.</p>
+
+            <div class="form-group">
+                <label for="login-rollno">Roll Number</label>
+                <input type="text" id="login-rollno" placeholder="e.g. 23CS136">
+            </div>
+
+            <button class="btn btn-primary" id="login-btn">Login to Account</button>
+            <p style="margin-top: 1.5rem; font-size: 0.875rem;">
+                No account? <a href="#" id="show-register"
+                    style="color: var(--primary); font-weight: 700; text-decoration: none;">Create One</a>
+            </p>
+
+            <!-- Install Button -->
+            <div id="install-banner" class="install-banner hidden">
+                <p>Install JustCall for a better experience</p>
+                <button id="install-btn" class="btn btn-primary btn-install">Install App</button>
+            </div>
+        </div>
+
+        <!-- Register Screen -->
+        <div id="register-section" class="card fade-in hidden">
+            <h1>Join Us</h1>
+            <p class="subtitle">Ready to start calling?</p>
+
+            <div class="form-group">
+                <label for="reg-rollno">Roll Number</label>
+                <input type="text" id="reg-rollno" placeholder="e.g. 23CS136">
+            </div>
+
+            <div class="form-group">
+                <label for="reg-name">Full Name</label>
+                <input type="text" id="reg-name" placeholder="John Doe">
+            </div>
+
+            <div class="form-group">
+                <label for="reg-email">Email</label>
+                <input type="email" id="reg-email" placeholder="john@example.com">
+            </div>
+
+            <button class="btn btn-primary" id="register-btn">Create Account</button>
+            <p style="margin-top: 1.5rem; font-size: 0.875rem;">
+                Have an account? <a href="#" id="show-login"
+                    style="color: var(--primary); font-weight: 700; text-decoration: none;">Login</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div class="container hidden" id="dashboard-container">
+        <div class="card fade-in">
+            <div class="user-card">
+                <div class="avatar" id="user-avatar">?</div>
+                <div class="user-meta">
+                    <h3 id="display-name">Loading...</h3>
+                    <div class="status-badge">
+                        <div class="status-dot"></div>
+                        <span>Online</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Find a Peer</label>
+                <input type="text" id="target-rollno" placeholder="Enter target roll number">
+            </div>
+
+            <button class="btn btn-primary" id="call-btn" style="margin-bottom: 1rem;">
+                <span>📞</span> Start Call
+            </button>
+
+            <button id="logout-btn" class="btn"
+                style="background: rgba(239, 68, 68, 0.05); color: var(--danger); font-size: 0.9rem;">
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Call Screen overlay -->
+    <div id="call-screen" class="call-screen hidden">
+        <div class="caller-avatar">
+            <div class="pulse"></div>
+            <span id="call-avatar-text">?</span>
+        </div>
+        <h2 id="call-name">User Name</h2>
+        <p class="call-status" id="call-status">Calling...</p>
+
+        <div class="call-controls">
+            <button class="round-btn bg-danger" id="end-call-btn">✖</button>
+        </div>
+    </div>
+
+    <!-- Incoming Call Popup -->
+    <div id="incoming-call-popup" class="incoming-call-popup hidden">
+        <div class="incoming-info">
+            <div class="avatar" id="incoming-avatar">?</div>
+            <div>
+                <strong id="incoming-name">Roll No: --</strong>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Incoming voice call...</p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="round-btn bg-danger" id="reject-call-btn"
+                style="width: 44px; height: 44px; font-size: 1rem;">✖</button>
+            <button class="round-btn bg-success" id="accept-call-btn"
+                style="width: 44px; height: 44px; font-size: 1rem;">✔</button>
+        </div>
+    </div>
+
+    <!-- Audio elements -->
+    <audio id="localAudio" autoplay muted></audio>
+    <audio id="remoteAudio" autoplay></audio>
+    <audio id="ringtone" src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" loop></audio>
+    <audio id="dialtone" src="https://assets.mixkit.co/active_storage/sfx/1358/1358-preview.mp3" loop></audio>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="webrtc.js"></script>
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed', err));
+            });
+        }
+    </script>
+</body>
+
+</html>
