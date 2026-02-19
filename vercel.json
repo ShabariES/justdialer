@@ -1,0 +1,12 @@
+{
+    "name": "just-call",
+    "version": 2,
+    "public": true,
+    "cleanUrls": true,
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/frontend/$1"
+        }
+    ]
+}
