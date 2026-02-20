@@ -1,5 +1,5 @@
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:2000'
+    ? 'http://localhost:5000'
     : window.location.origin;
 let socket;
 let currentUser = null;
@@ -153,9 +153,8 @@ function initDashboard() {
     });
 
     socket.on('offer', async ({ offer, fromRollNo }) => {
-        // Offer received logic is handled via WebRTC negotiation flow usually
-        // But for this simple implementation, we might need to handle it if we are already in 'connecting' state
-        // This part relies on webrtc.js mostly
+        console.log('Received offer from:', fromRollNo);
+        if (window.handleOffer) window.handleOffer(offer, fromRollNo);
     });
 
     // Delegating WebRTC signals to webrtc.js functions (assumed global)
@@ -196,12 +195,12 @@ function handleIncomingCall(fromRollNo) {
     document.getElementById('ringtone').play();
 }
 
-function acceptCall() {
+async function acceptCall() {
     incomingPopup.classList.add('hidden');
     document.getElementById('ringtone').pause();
     showCallScreen(currentTargetRollNo, 'Connecting...');
     socket.emit('accept-call', { toRollNo: currentTargetRollNo });
-    startWebRTCConnection(currentTargetRollNo, false); // We are answering
+    await startWebRTCConnection(currentTargetRollNo, false); // We are answering
     startCallTimer();
 }
 

@@ -21,7 +21,7 @@ const io = new Server(server, {
     }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 // API: Register User
 app.post('/register', async (req, res) => {

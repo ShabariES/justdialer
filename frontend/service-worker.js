@@ -1,4 +1,4 @@
-const CACHE_NAME = 'justcall-v1';
+const CACHE_NAME = 'justcall-v2';
 const ASSETS = [
     '/',
     '/index.html',
@@ -18,6 +18,7 @@ self.addEventListener('install', (event) => {
             return cache.addAll(ASSETS);
         })
     );
+    self.skipWaiting();
 });
 
 // Activate Event
@@ -34,15 +35,20 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Event
 self.addEventListener('fetch', (event) => {
-    // Skip caching for socket.io and API calls if needed, 
-    // but here we focus on static assets.
-    if (event.request.url.includes('socket.io') || event.request.url.includes('/api/')) {
+    // Bypass cache for POST requests (Login/Register) and Socket.io
+    if (event.request.method !== 'GET' ||
+        event.request.url.includes('socket.io') ||
+        event.request.url.includes('/login') ||
+        event.request.url.includes('/register')) {
         return;
     }
 
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
-            return cachedResponse || fetch(event.request);
+            return cachedResponse || fetch(event.request).catch(() => {
+                // If fetch fails and no cache, just let it fail naturally
+                return null;
+            });
         })
     );
 });

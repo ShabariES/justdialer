@@ -1,11 +1,24 @@
 let pc;
 let localStream;
+let remoteCandidateQueue = [];
+let pcPromise = null;
+let resolvePc;
+
 const config = {
     iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' }
     ]
 };
+
+function resetPcPromise() {
+    pcPromise = new Promise(resolve => {
+        resolvePc = resolve;
+    });
+}
+
+// Initialize the promise
+resetPcPromise();
 
 async function startWebRTCConnection(targetRollNo, isCaller) {
     console.log(`Starting WebRTC as ${isCaller ? 'Caller' : 'Receiver'}`);
@@ -15,6 +28,10 @@ async function startWebRTCConnection(targetRollNo, isCaller) {
         document.getElementById('localAudio').srcObject = localStream;
 
         pc = new RTCPeerConnection(config);
+        remoteCandidateQueue = []; // Reset queue for new connection
+
+        // Resolve the promise so handleOffer/handleAnswer can continue
+        resolvePc(pc);
 
         // Add local tracks to peer connection
         localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
@@ -49,16 +66,19 @@ async function startWebRTCConnection(targetRollNo, isCaller) {
 }
 
 async function handleOffer(offer, fromRollNo) {
-    if (!pc) {
-        // This is the case where we just accepted the call and are ready
-        // But the offer might arrive before startWebRTCConnection finishes its setup
-        // Actually, startWebRTCConnection(..., false) should be called first
-    }
+    console.log('Handling offer from:', fromRollNo);
+    // Wait for PC to be initialized if it's not yet
+    const currentPc = await pcPromise;
 
     try {
-        await pc.setRemoteDescription(new RTCSessionDescription(offer));
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
+        await currentPc.setRemoteDescription(new RTCSessionDescription(offer));
+        console.log('Remote description set (Offer)');
+
+        // Process queued candidates
+        await processQueuedCandidates();
+
+        const answer = await currentPc.createAnswer();
+        await currentPc.setLocalDescription(answer);
         socket.emit('answer', { toRollNo: fromRollNo, answer });
     } catch (err) {
         console.error('Error handling offer:', err);
@@ -66,20 +86,47 @@ async function handleOffer(offer, fromRollNo) {
 }
 
 async function handleAnswer(answer) {
+    console.log('Handling answer');
+    const currentPc = await pcPromise;
     try {
-        await pc.setRemoteDescription(new RTCSessionDescription(answer));
+        await currentPc.setRemoteDescription(new RTCSessionDescription(answer));
+        console.log('Remote description set (Answer)');
+
+        // Process queued candidates
+        await processQueuedCandidates();
     } catch (err) {
         console.error('Error handling answer:', err);
     }
 }
 
 async function handleIceCandidate(candidate) {
+    if (!pc) {
+        console.log('PC not initialized yet, queuing candidate');
+        remoteCandidateQueue.push(candidate);
+        return;
+    }
+
     try {
-        if (pc) {
+        if (pc.remoteDescription && pc.remoteDescription.type) {
             await pc.addIceCandidate(new RTCIceCandidate(candidate));
+        } else {
+            console.log('Remote description not set yet, queuing candidate');
+            remoteCandidateQueue.push(candidate);
         }
     } catch (err) {
         console.error('Error adding ICE candidate:', err);
+    }
+}
+
+async function processQueuedCandidates() {
+    console.log(`Processing ${remoteCandidateQueue.length} queued candidates`);
+    while (remoteCandidateQueue.length > 0) {
+        const candidate = remoteCandidateQueue.shift();
+        try {
+            await pc.addIceCandidate(new RTCIceCandidate(candidate));
+        } catch (e) {
+            console.error('Error adding queued candidate:', e);
+        }
     }
 }
 
@@ -92,4 +139,13 @@ function stopWebRTC() {
         localStream.getTracks().forEach(track => track.stop());
         localStream = null;
     }
+    remoteCandidateQueue = [];
+    resetPcPromise(); // Reset for next call
 }
+
+// Ensure functions are globally accessible
+window.handleOffer = handleOffer;
+window.handleAnswer = handleAnswer;
+window.handleIceCandidate = handleIceCandidate;
+window.startWebRTCConnection = startWebRTCConnection;
+window.stopWebRTC = stopWebRTC;
