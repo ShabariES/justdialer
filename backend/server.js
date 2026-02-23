@@ -21,7 +21,7 @@ const io = new Server(server, {
     }
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 // API: Register User
 app.post('/register', async (req, res) => {
@@ -32,14 +32,16 @@ app.post('/register', async (req, res) => {
 
     // Validation
     if (!rollno || !/^[a-zA-Z0-9]+$/.test(rollno)) {
-        console.log('Validation failed: Invalid Roll Number');
-        return res.status(400).json({ success: false, message: 'Invalid Roll Number' });
+        return res.status(400).json({ success: false, message: 'Invalid Roll Number (Alphanumeric only)' });
     }
 
     try {
+        const insertData = { rollno, name: name || 'User', online: false };
+        if (email) insertData.email = email;
+
         const { data, error } = await supabase
             .from('users')
-            .insert([{ rollno, name, email, online: false }])
+            .insert([insertData])
             .select();
 
         if (error) {
@@ -106,6 +108,21 @@ app.get('/user/:rollno', async (req, res) => {
 io.on('connection', (socket) => {
     console.log('Socket connected:', socket.id);
 
+    async function broadcastOnlineUsers() {
+        try {
+            const { data, error } = await supabase
+                .from('users')
+                .select('rollno, name, email, online')
+                .eq('online', true);
+
+            if (!error && data) {
+                io.emit('online-users-update', data);
+            }
+        } catch (error) {
+            console.error('Error broadcasting online users:', error);
+        }
+    }
+
     socket.on('register-user', async (rollno) => {
         try {
             await supabase
@@ -115,6 +132,7 @@ io.on('connection', (socket) => {
 
             socket.rollno = rollno;
             console.log(`User ${rollno} registered with socket ${socket.id}`);
+            broadcastOnlineUsers(); // Broadcast update
         } catch (error) {
             console.error('Error updating status:', error);
         }
@@ -182,6 +200,7 @@ io.on('connection', (socket) => {
                     .from('users')
                     .update({ online: false, socket_id: null })
                     .eq('rollno', socket.rollno);
+                broadcastOnlineUsers(); // Broadcast update
             } catch (error) {
                 console.error('Error on disconnect:', error);
             }

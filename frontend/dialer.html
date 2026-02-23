@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Dialer | JustCall</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-bg"></div>
+    <div class="blob-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container" id="dialer-page">
+        <header class="header-glass fade-up">
+            <span class="logo-text">JustCall</span>
+            <button id="logout-btn" class="btn-call-circle" onclick="logout()"
+                style="background: rgba(99, 102, 241, 0.1);">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </button>
+        </header>
+
+        <main class="main-content fade-up" style="animation-delay: 0.1s;">
+            <div class="glass-card" style="padding: 30px 24px; margin-bottom: 24px;">
+                <p
+                    style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); text-align: center; margin-bottom: 15px; letter-spacing: 1px;">
+                    Direct Interface</p>
+                <input type="text" id="target-rollno" class="dial-input-styled" placeholder="Roll No ID" readonly
+                    onclick="toggleKeyboard()"
+                    style="text-align: center; font-size: 2.2rem; width: 100%; border: none; background: transparent; font-weight: 800; color: var(--text-main); outline: none;">
+                <div
+                    style="height: 3px; width: 80px; background: var(--primary); margin: 15px auto 0 auto; border-radius: 10px; box-shadow: 0 2px 10px var(--primary-glow);">
+                </div>
+            </div>
+
+            <div class="keyboard-luxury-container" id="qwerty-keyboard">
+                <!-- Row 1 -->
+                <div class="kb-row">
+                    <button class="kb-key" onclick="appendDial('Q')">Q</button>
+                    <button class="kb-key" onclick="appendDial('W')">W</button>
+                    <button class="kb-key" onclick="appendDial('E')">E</button>
+                    <button class="kb-key" onclick="appendDial('R')">R</button>
+                    <button class="kb-key" onclick="appendDial('T')">T</button>
+                    <button class="kb-key" onclick="appendDial('Y')">Y</button>
+                    <button class="kb-key" onclick="appendDial('U')">U</button>
+                    <button class="kb-key" onclick="appendDial('I')">I</button>
+                    <button class="kb-key" onclick="appendDial('O')">O</button>
+                    <button class="kb-key" onclick="appendDial('P')">P</button>
+                </div>
+                <!-- Row 2 -->
+                <div class="kb-row">
+                    <div class="kb-spacer"></div>
+                    <button class="kb-key" onclick="appendDial('A')">A</button>
+                    <button class="kb-key" onclick="appendDial('S')">S</button>
+                    <button class="kb-key" onclick="appendDial('D')">D</button>
+                    <button class="kb-key" onclick="appendDial('F')">F</button>
+                    <button class="kb-key" onclick="appendDial('G')">G</button>
+                    <button class="kb-key" onclick="appendDial('H')">H</button>
+                    <button class="kb-key" onclick="appendDial('J')">J</button>
+                    <button class="kb-key" onclick="appendDial('K')">K</button>
+                    <button class="kb-key" onclick="appendDial('L')">L</button>
+                    <div class="kb-spacer"></div>
+                </div>
+                <!-- Row 3 -->
+                <div class="kb-row">
+                    <button class="kb-key special shift-key" onclick="toggleShift()"><i
+                            class="fa-solid fa-arrow-up"></i></button>
+                    <button class="kb-key" onclick="appendDial('Z')">Z</button>
+                    <button class="kb-key" onclick="appendDial('X')">X</button>
+                    <button class="kb-key" onclick="appendDial('C')">C</button>
+                    <button class="kb-key" onclick="appendDial('V')">V</button>
+                    <button class="kb-key" onclick="appendDial('B')">B</button>
+                    <button class="kb-key" onclick="appendDial('N')">N</button>
+                    <button class="kb-key" onclick="appendDial('M')">M</button>
+                    <button class="kb-key special del-key" onclick="backspaceDial()"><i
+                            class="fa-solid fa-delete-left"></i></button>
+                </div>
+                <!-- Row 4 -->
+                <div class="kb-row">
+                    <button class="kb-key special" onclick="toggleNumbers()" style="flex: 1.5;">123</button>
+                    <button class="kb-key space-key" onclick="appendDial(' ')" style="flex: 5;">space</button>
+                    <button class="kb-key special return-key" onclick="startCall()" style="flex: 2;">return</button>
+                </div>
+            </div>
+
+            <button class="btn-luxury initiate-call-pulse" id="call-btn" style="margin-top: 25px; border-radius: 20px;">
+                <i class="fa-solid fa-phone-flip"></i>
+                <span style="margin-left: 12px;">Start Pulse</span>
+            </button>
+        </main>
+
+        <nav class="nav-bar">
+            <a href="online.html" class="nav-link">
+                <i class="fa-solid fa-users-viewfinder"></i>
+                <span>Peers</span>
+            </a>
+            <a href="dialer.html" class="nav-link active">
+                <i class="fa-solid fa-phone-flip"></i>
+                <span>Dialer</span>
+            </a>
+            <a href="profile.html" class="nav-link">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>Me</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Immersive Call Screen overlay -->
+    <div id="call-screen" class="call-overlay-screen hidden">
+        <div class="call-bg-blurred" id="call-bg-blur"></div>
+        <div style="text-align: center;">
+            <div class="large-avatar-glow" id="call-avatar-container">
+                <div class="pulse-ring-luxury"></div>
+                <div class="pulse-ring-luxury" style="animation-delay: 1s;"></div>
+                <span id="call-avatar-text">?</span>
+            </div>
+            <h2 id="call-name" style="font-size: 2.22rem; font-weight: 800; margin-top: 24px;">User Name</h2>
+            <p class="call-timer-premium" id="call-status">CONNECTING</p>
+        </div>
+
+        <div class="call-actions-row">
+            <button class="action-circle" id="mute-btn"><i class="fa-solid fa-microphone-slash"></i></button>
+            <button class="action-circle end-call-luxury" id="end-call-btn" style="margin: 0 10px;"><i
+                    class="fa-solid fa-phone-slash"></i></button>
+            <button class="action-circle" id="speaker-btn"><i class="fa-solid fa-volume-high"></i></button>
+        </div>
+    </div>
+
+    <!-- Incoming Call Popup (Shared) -->
+    <div id="incoming-call-popup" class="incoming-popup hidden">
+        <div class="incoming-avatar" id="incoming-avatar">?</div>
+        <div class="incoming-info">
+            <h4 id="incoming-name">Unknown</h4>
+            <p>Incoming Pulse...</p>
+        </div>
+        <div class="incoming-actions">
+            <button class="reject-btn" id="reject-call-btn"><i class="fa-solid fa-xmark"></i></button>
+            <button class="accept-btn" id="accept-call-btn"><i class="fa-solid fa-check"></i></button>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="webrtc.js"></script>
+    <script src="app.js"></script>
+    <script>
+        if (!localStorage.getItem('currentUser')) {
+            window.location.href = 'index.html';
+        } else {
+            currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            initDashboard();
+        }
+
+        let isShifted = true;
+        let isNumericMode = false;
+
+        function appendDial(val) {
+            const input = document.getElementById('target-rollno');
+            if (val === ' ') {
+                input.value += ' ';
+            } else {
+                input.value += isShifted ? val.toUpperCase() : val.toLowerCase();
+            }
+            vibrateTap();
+        }
+
+        function backspaceDial() {
+            const input = document.getElementById('target-rollno');
+            input.value = input.value.slice(0, -1);
+            vibrateTap();
+        }
+
+        function toggleShift() {
+            isShifted = !isShifted;
+            const keys = document.querySelectorAll('.kb-key:not(.special)');
+            const shiftBtn = document.querySelector('.shift-key');
+
+            shiftBtn.classList.toggle('active', isShifted);
+            keys.forEach(key => {
+                if (key.innerText.length === 1) {
+                    key.innerText = isShifted ? key.innerText.toUpperCase() : key.innerText.toLowerCase();
+                }
+            });
+            vibrateTap();
+        }
+
+        const qwertyLayout = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M'];
+        const numericLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '/', ':', ';', '(', ')', '$', '&', '@', '.', ',', '?', '!', '\'', '\"', '#'];
+
+        function toggleNumbers() {
+            isNumericMode = !isNumericMode;
+            const keys = document.querySelectorAll('.kb-key:not(.special)');
+            const toggleBtn = document.querySelector('.kb-row:last-child .kb-key.special:first-child');
+
+            toggleBtn.innerText = isNumericMode ? 'ABC' : '123';
+
+            const layout = isNumericMode ? numericLayout : qwertyLayout;
+            keys.forEach((key, index) => {
+                if (index < layout.length) {
+                    key.innerText = layout[index];
+                    // Update the onclick val
+                    key.setAttribute('onclick', `appendDial('${layout[index]}')`);
+                }
+            });
+            vibrateTap();
+        }
+
+        function vibrateTap() {
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(12);
+            }
+        }
+    </script>
+</body>
+
+</html>

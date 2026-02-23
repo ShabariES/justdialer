@@ -5,238 +5,110 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JustCall | Modern Voice</title>
-    <meta name="theme-color" content="#6366f1">
-    <meta name="description" content="Real-time voice calls using Roll Numbers. Fast, P2P, and easy to use.">
-
-    <!-- PWA Capable -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3616/3616215.png">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3616/3616215.png">
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Styles -->
+    <title>JustCall | Connect Instantly</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
-    <!-- Background Elements -->
-    <div class="bg-blob blob-1"></div>
-    <div class="bg-blob blob-2"></div>
-
-    <div class="container" id="auth-container">
-        <!-- Login Screen -->
-        <div id="login-section" class="card fade-in glass-panel">
-            <div class="logo-container">
-                <i class="fa-solid fa-phone-volume"></i>
-            </div>
-            <h1>JustCall</h1>
-            <p class="subtitle">Voice calling, reimagined.</p>
-
-            <div class="form-group">
-                <label for="login-rollno">Roll Number</label>
-                <div class="input-wrapper">
-                    <i class="fa-regular fa-id-card"></i>
-                    <input type="text" id="login-rollno" placeholder="e.g. 23CS136">
-                </div>
-            </div>
-
-            <button class="btn btn-primary btn-lg" id="login-btn">
-                <span>Login</span> <i class="fa-solid fa-arrow-right"></i>
-            </button>
-
-            <p class="auth-switch">
-                New here? <a href="#" id="show-register">Create Account</a>
-            </p>
-        </div>
-
-        <!-- Register Screen -->
-        <div id="register-section" class="card fade-in glass-panel hidden">
-            <h1>Join Us</h1>
-            <p class="subtitle">Create your ID today.</p>
-
-            <div class="form-group">
-                <label for="reg-rollno">Roll Number</label>
-                <div class="input-wrapper">
-                    <i class="fa-regular fa-id-card"></i>
-                    <input type="text" id="reg-rollno" placeholder="e.g. 23CS136">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="reg-name">Full Name</label>
-                <div class="input-wrapper">
-                    <i class="fa-regular fa-user"></i>
-                    <input type="text" id="reg-name" placeholder="John Doe">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="reg-email">Email</label>
-                <div class="input-wrapper">
-                    <i class="fa-regular fa-envelope"></i>
-                    <input type="email" id="reg-email" placeholder="john@example.com">
-                </div>
-            </div>
-
-            <button class="btn btn-primary btn-lg" id="register-btn">Create Account</button>
-            <p class="auth-switch">
-                Already have an ID? <a href="#" id="show-login">Login</a>
-            </p>
-        </div>
+    <div class="app-bg"></div>
+    <div class="blob-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
     </div>
 
-    <!-- Dashboard Screen -->
-    <div class="container hidden" id="dashboard-container">
-        <!-- Header -->
-        <header class="app-header glass-panel">
-            <div class="user-info">
-                <div class="avatar-sm" id="user-avatar">?</div>
-                <div>
-                    <h3 id="display-name">Loading...</h3>
-                    <small id="display-rollno">...</small>
-                </div>
-            </div>
-            <button id="logout-btn" class="icon-btn">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            </button>
-        </header>
-
-        <!-- Main Content -->
-        <div class="dashboard-content fade-in">
-            <div class="status-card glass-panel">
-                <div class="status-indicator">
-                    <div class="status-dot"></div>
-                    <span>System Online</span>
-                </div>
-                <p>Ready to connect seamlessly.</p>
+    <div class="container" id="auth-page">
+        <!-- Login Section -->
+        <div id="login-section" class="fade-up">
+            <div class="auth-hero">
+                <div class="auth-logo"><i class="fa-solid fa-phone-volume"></i></div>
+                <h1 style="font-size: 2.5rem; font-weight: 800; letter-spacing: -1.5px;">JustCall</h1>
+                <p style="color: var(--text-muted); font-weight: 500;">Your premium voice portal.</p>
             </div>
 
-            <div class="dial-card glass-panel">
-                <h2>Make a Call</h2>
-                <div class="form-group">
-                    <label>Enter Peer ID</label>
-                    <div class="input-wrapper lg">
-                        <i class="fa-solid fa-hashtag"></i>
-                        <input type="text" id="target-rollno" placeholder="Roll Number">
+            <div class="glass-card">
+                <div style="margin-bottom: 24px;">
+                    <label
+                        style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-left:8px; margin-bottom: 8px; display: block;">Roll
+                        Number</label>
+                    <input type="text" class="input-field" id="login-rollno" placeholder="e.g. 24AI101"
+                        style="margin-bottom: 0;">
+                </div>
+
+                <button class="btn-luxury" id="login-btn">
+                    <span>Sign In</span> <i class="fa-solid fa-arrow-right-long" style="margin-left: 10px;"></i>
+                </button>
+
+                <p
+                    style="text-align: center; margin-top: 24px; color: var(--text-muted); font-size: 0.9rem; font-weight: 600;">
+                    New student? <a href="#" id="show-register"
+                        style="color: var(--primary); text-decoration: none; font-weight: 800;">Create Access</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Register Section -->
+        <div id="register-section" class="fade-up hidden">
+            <div class="auth-hero" style="margin-bottom: 24px;">
+                <h1 style="font-size: 2.2rem; letter-spacing: -1px;">Join the Pulse</h1>
+                <p style="color: var(--text-muted);">Unified voice for campus.</p>
+            </div>
+
+            <div class="glass-card">
+                <div style="margin-bottom: 16px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <label
+                            style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted);">Identity
+                            ID</label>
+                        <button onclick="generateWiseID()"
+                            style="background: none; border: none; color: var(--primary); font-size: 0.7rem; font-weight: 800; cursor: pointer;">
+                            <i class="fa-solid fa-wand-sparkles"></i> MAGIC ID
+                        </button>
                     </div>
+                    <input type="text" class="input-field" id="reg-rollno" placeholder="Enter alphanumeric ID"
+                        style="margin-bottom: 0;">
                 </div>
-                <button class="btn btn-primary btn-lg btn-call" id="call-btn">
-                    <i class="fa-solid fa-phone"></i> Call Now
-                </button>
-            </div>
-        </div>
-    </div>
 
-    <!-- Full Screen Call Overlay -->
-    <div id="call-screen" class="call-screen hidden">
-        <div class="call-bg-blur"></div>
-
-        <div class="call-header">
-            <i class="fa-solid fa-lock"></i> End-to-End Encrypted
-        </div>
-
-        <div class="call-main">
-            <div class="caller-avatar-lg">
-                <div class="pulse-rings">
-                    <div></div>
-                    <div></div>
-                    <div></div>
+                <div style="margin-bottom: 24px;">
+                    <label
+                        style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; display: block;">Full
+                        Name</label>
+                    <input type="text" class="input-field" id="reg-name" placeholder="Your name"
+                        style="margin-bottom: 0;">
                 </div>
-                <span id="call-avatar-text">?</span>
-            </div>
-            <h2 id="call-name">User Name</h2>
-            <p class="call-status" id="call-status">Calling...</p>
-        </div>
 
-        <div class="call-actions">
-            <!-- Dummy buttons for UI feel -->
-            <button class="action-btn secondary-action" id="mute-btn">
-                <i class="fa-solid fa-microphone-slash"></i>
-            </button>
-            <button class="action-btn secondary-action" id="speaker-btn">
-                <i class="fa-solid fa-volume-high"></i>
-            </button>
+                <button class="btn-luxury" id="register-btn">Establish Profile</button>
 
-            <button class="action-btn end-call bg-danger" id="end-call-btn">
-                <i class="fa-solid fa-phone-slash"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Incoming Call Popup (Bottom Sheet style) -->
-    <div id="incoming-call-popup" class="incoming-sheet hidden">
-        <div class="sheet-handle"></div>
-        <div class="incoming-content">
-            <div class="incoming-header">
-                <div class="avatar-md" id="incoming-avatar">?</div>
-                <div class="incoming-text">
-                    <h3 id="incoming-name">Unknown</h3>
-                    <p>Incoming Audio Call...</p>
-                </div>
-            </div>
-            <div class="incoming-actions">
-                <button class="action-btn bg-danger" id="reject-call-btn">
-                    <i class="fa-solid fa-phone-slash"></i>
-                </button>
-                <button class="action-btn bg-success" id="accept-call-btn">
-                    <i class="fa-solid fa-phone"></i>
-                </button>
+                <p
+                    style="text-align: center; margin-top: 24px; color: var(--text-muted); font-size: 0.9rem; font-weight: 600;">
+                    Already active? <a href="#" id="show-login"
+                        style="color: var(--primary); text-decoration: none; font-weight: 800;">Login</a>
+                </p>
             </div>
         </div>
     </div>
 
-    <!-- PWA Install Banner (Fixed Bottom) -->
-    <div id="install-banner" class="install-banner-fixed hidden">
-        <div class="install-content">
-            <div class="app-icon-small">
-                <i class="fa-solid fa-phone"></i>
-            </div>
-            <div class="install-text">
-                <strong>Install JustCall</strong>
-                <span>Add to Home Screen for the best experience</span>
-            </div>
+    <!-- Incoming Call Popup (Shared) -->
+    <div id="incoming-call-popup" class="incoming-popup hidden">
+        <div class="incoming-avatar" id="incoming-avatar">?</div>
+        <div class="incoming-info">
+            <h4 id="incoming-name">Unknown</h4>
+            <p>Incoming Pulse...</p>
         </div>
-        <button id="install-btn" class="btn-sm btn-light">
-            Install
-        </button>
-        <button id="close-install-btn" class="close-icon">&times;</button>
+        <div class="incoming-actions">
+            <button class="reject-btn" id="reject-call-btn"><i class="fa-solid fa-xmark"></i></button>
+            <button class="accept-btn" id="accept-call-btn"><i class="fa-solid fa-phone"></i></button>
+        </div>
     </div>
 
-    <!-- Audio elements -->
-    <audio id="localAudio" autoplay muted></audio>
-    <audio id="remoteAudio" autoplay></audio>
-    <audio id="ringtone" src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" loop></audio>
-    <audio id="dialtone" src="https://assets.mixkit.co/active_storage/sfx/1358/1358-preview.mp3" loop></audio>
-
-    <!-- Scripts -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <!-- Simple WebRTC Logic embedded or loaded -->
-    <script src="webrtc.js"></script>
     <script src="app.js"></script>
     <script>
-        // Simple theme color adaptation
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0f172a');
-        }
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
-                    .then(reg => console.log('Service Worker registered'))
-                    .catch(err => console.log('Service Worker registration failed', err));
-            });
+        if (localStorage.getItem('currentUser')) {
+            window.location.href = 'online.html';
         }
     </script>
 </body>

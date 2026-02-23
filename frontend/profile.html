@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Me | JustCall</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-bg"></div>
+    <div class="blob-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container" id="profile-page">
+        <header class="header-glass fade-up">
+            <span class="logo-text">Profile</span>
+            <button id="logout-btn" class="btn-call-circle">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+        </header>
+
+        <main class="main-content fade-up" style="animation-delay: 0.1s;">
+            <div class="glass-card" style="text-align: center; padding: 40px 20px;">
+                <div class="large-avatar-glow"
+                    style="width: 120px; height: 120px; font-size: 3.5rem; margin: 0 auto 24px auto; border-radius: 40px;">
+                    <span id="user-avatar-large">?</span>
+                    <div
+                        style="position: absolute; bottom: -6px; right: -6px; width: 32px; height: 32px; background: #10b981; border: 4px solid white; border-radius: 50%;">
+                    </div>
+                </div>
+                <h1 id="profile-name" style="font-size: 2rem; letter-spacing: -1px; margin-bottom: 4px;">User Name</h1>
+                <p id="profile-rollno"
+                    style="color: var(--primary); font-weight: 800; letter-spacing: 1px; font-size: 0.9rem;">ID: --</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                <div class="glass-card" style="padding: 20px; text-align: center; margin-bottom: 0;">
+                    <i class="fa-solid fa-bolt" style="color: #f59e0b; font-size: 1.5rem; margin-bottom: 12px;"></i>
+                    <div style="font-size: 1.5rem; font-weight: 800;">Elite</div>
+                    <div
+                        style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase;">
+                        Status</div>
+                </div>
+                <div class="glass-card" style="padding: 20px; text-align: center; margin-bottom: 0;">
+                    <i class="fa-solid fa-shield-halved"
+                        style="color: #6366f1; font-size: 1.5rem; margin-bottom: 12px;"></i>
+                    <div style="font-size: 1.5rem; font-weight: 800;">Secure</div>
+                    <div
+                        style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase;">
+                        P2P Encryption</div>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h3
+                    style="font-size: 0.9rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 20px;">
+                    System Preferences</h3>
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 700;">HD Voice Mode</span>
+                        <div
+                            style="width: 44px; height: 24px; background: var(--primary); border-radius: 100px; position: relative; cursor: pointer;">
+                            <div
+                                style="position: absolute; right: 4px; top: 4px; width: 16px; height: 16px; background: white; border-radius: 50%;">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 700;">Noise Reduction</span>
+                        <div
+                            style="width: 44px; height: 24px; background: #e2e8f0; border-radius: 100px; position: relative; cursor: pointer;">
+                            <div
+                                style="position: absolute; left: 4px; top: 4px; width: 16px; height: 16px; background: white; border-radius: 50%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="logout()" class="btn-luxury"
+                style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 2px solid rgba(239, 68, 68, 0.2); box-shadow: none;">
+                <i class="fa-solid fa-door-open" style="margin-right: 10px;"></i> TERMINATE SESSION
+            </button>
+        </main>
+
+        <nav class="nav-bar">
+            <a href="online.html" class="nav-link">
+                <i class="fa-solid fa-users-viewfinder"></i>
+                <span>Peers</span>
+            </a>
+            <a href="dialer.html" class="nav-link">
+                <i class="fa-solid fa-phone-flip"></i>
+                <span>Dialer</span>
+            </a>
+            <a href="profile.html" class="nav-link active">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>Me</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Incoming Call Popup (Shared) -->
+    <div id="incoming-call-popup" class="incoming-popup hidden">
+        <div class="incoming-avatar" id="incoming-avatar">?</div>
+        <div class="incoming-info">
+            <h4 id="incoming-name">Unknown</h4>
+            <p>Incoming Pulse...</p>
+        </div>
+        <div class="incoming-actions">
+            <button class="reject-btn" id="reject-call-btn">✖</button>
+            <button class="accept-btn" id="accept-call-btn">✔</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="app.js"></script>
+    <script>
+        if (!localStorage.getItem('currentUser')) {
+            window.location.href = 'index.html';
+        } else {
+            currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            initDashboard();
+
+            // Set profile data
+            document.getElementById('profile-name').innerText = currentUser.name;
+            document.getElementById('profile-rollno').innerText = `ID: ${currentUser.rollno}`;
+            document.getElementById('user-avatar-large').innerText = currentUser.name[0].toUpperCase();
+        }
+    </script>
+</body>
+
+</html>

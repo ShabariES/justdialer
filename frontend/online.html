@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Peers | JustCall</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-bg"></div>
+    <div class="blob-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container" id="online-page">
+        <header class="header-glass fade-up">
+            <div class="user-pill" onclick="window.location.href='profile.html'" style="cursor: pointer;">
+                <div class="avatar-badge">
+                    <div class="avatar-sm" id="user-avatar">?</div>
+                    <div class="status-indicator"></div>
+                </div>
+                <div>
+                    <h3 id="display-name" style="font-size: 1rem; font-weight: 800;">Loading...</h3>
+                    <p
+                        style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">
+                        Active Profile</p>
+                </div>
+            </div>
+            <button id="logout-btn" class="btn-call-circle" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+        </header>
+
+        <main class="main-content fade-up" style="animation-delay: 0.1s;">
+            <div class="section-title">
+                <span>Active Peers</span>
+                <div style="padding: 4px 12px; background: var(--primary); color: white; border-radius: 100px; font-size: 0.75rem;"
+                    id="online-count">0</div>
+            </div>
+
+            <div class="users-list" id="users-list">
+                <div class="peer-item skeleton" style="height: 72px;"></div>
+                <div class="peer-item skeleton" style="height: 72px; animation-delay: 0.2s;"></div>
+                <div class="peer-item skeleton" style="height: 72px; animation-delay: 0.4s;"></div>
+            </div>
+        </main>
+
+        <nav class="nav-bar">
+            <a href="online.html" class="nav-link active">
+                <i class="fa-solid fa-users-viewfinder"></i>
+                <span>Peers</span>
+            </a>
+            <a href="dialer.html" class="nav-link">
+                <i class="fa-solid fa-phone-flip"></i>
+                <span>Dialer</span>
+            </a>
+            <a href="profile.html" class="nav-link">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>Me</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Incoming Call Popup (Shared) -->
+    <div id="incoming-call-popup" class="incoming-popup hidden">
+        <div class="incoming-avatar" id="incoming-avatar">?</div>
+        <div class="incoming-info">
+            <h4 id="incoming-name">Unknown</h4>
+            <p>Incoming Pulse...</p>
+        </div>
+        <div class="incoming-actions">
+            <button class="reject-btn" id="reject-call-btn"><i class="fa-solid fa-xmark"></i></button>
+            <button class="accept-btn" id="accept-call-btn"><i class="fa-solid fa-phone"></i></button>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="app.js"></script>
+    <script>
+        if (!localStorage.getItem('currentUser')) {
+            window.location.href = 'index.html';
+        } else {
+            currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            initDashboard();
+        }
+    </script>
+</body>
+
+</html>
