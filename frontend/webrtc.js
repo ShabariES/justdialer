@@ -24,8 +24,37 @@ async function startWebRTCConnection(targetRollNo, isCaller) {
     console.log(`Starting WebRTC as ${isCaller ? 'Caller' : 'Receiver'}`);
 
     try {
-        localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        document.getElementById('localAudio').srcObject = localStream;
+        // Ensure audio elements exist
+        let localAudio = document.getElementById('localAudio');
+        let remoteAudio = document.getElementById('remoteAudio');
+
+        if (!localAudio) {
+            localAudio = document.createElement('audio');
+            localAudio.id = 'localAudio';
+            localAudio.autoplay = true;
+            localAudio.muted = true; // Local audio should be muted to avoid feedback
+            localAudio.style.display = 'none';
+            document.body.appendChild(localAudio);
+        }
+
+        if (!remoteAudio) {
+            remoteAudio = document.createElement('audio');
+            remoteAudio.id = 'remoteAudio';
+            remoteAudio.autoplay = true;
+            remoteAudio.style.display = 'none';
+            document.body.appendChild(remoteAudio);
+        }
+
+        localStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true,
+                sampleRate: 48000,
+                channelCount: 1
+            }
+        });
+        localAudio.srcObject = localStream;
 
         pc = new RTCPeerConnection(config);
         remoteCandidateQueue = []; // Reset queue for new connection
@@ -49,7 +78,9 @@ async function startWebRTCConnection(targetRollNo, isCaller) {
         // Remote stream handling
         pc.ontrack = (event) => {
             console.log('Received remote track');
-            document.getElementById('remoteAudio').srcObject = event.streams[0];
+            if (remoteAudio) {
+                remoteAudio.srcObject = event.streams[0];
+            }
         };
 
         if (isCaller) {
@@ -60,7 +91,11 @@ async function startWebRTCConnection(targetRollNo, isCaller) {
 
     } catch (err) {
         console.error('WebRTC Error:', err);
-        alert('Could not access microphone');
+        if (err.name === 'NotAllowedError') {
+            alert('Microphone access denied. Please allow microphone permissions in your browser settings.');
+        } else {
+            alert('Could not access microphone: ' + err.message);
+        }
         closeCallScreen();
     }
 }

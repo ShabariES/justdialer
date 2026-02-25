@@ -91,18 +91,88 @@
         </div>
     </div>
 
-    <!-- Incoming Call Popup (Shared) -->
-    <div id="incoming-call-popup" class="incoming-popup hidden">
-        <div class="incoming-avatar" id="incoming-avatar">?</div>
-        <div class="incoming-info">
-            <h4 id="incoming-name">Unknown</h4>
-            <p>Incoming Pulse...</p>
+    <!-- Incoming Call Screen (Shared) -->
+    <div id="incoming-call-popup" class="incoming-fullscreen hidden">
+        <div style="text-align: center;">
+            <div class="large-avatar-glow">
+                <div class="pulse-ring-luxury"></div>
+                <span id="incoming-avatar">?</span>
+            </div>
+            <h2 id="incoming-name" style="font-size: 2.2rem; margin-top: 24px;">User Name</h2>
+            <p style="color: #818cf8; font-weight: 600; margin-top: 8px;">Incoming Pulse...</p>
         </div>
-        <div class="incoming-actions">
-            <button class="reject-btn" id="reject-call-btn"><i class="fa-solid fa-xmark"></i></button>
-            <button class="accept-btn" id="accept-call-btn"><i class="fa-solid fa-phone"></i></button>
+
+        <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <button class="msg-pill-btn"><i class="fa-solid fa-comment"></i> Message</button>
+            <div class="incoming-action-pill" id="slide-pill">
+                <span class="pill-side-label pill-label-left">Decline</span>
+                <div class="pill-center-main" id="slide-handle">
+                    <i class="fa-solid fa-phone"></i>
+                </div>
+                <span class="pill-side-label pill-label-right">Answer</span>
+            </div>
         </div>
     </div>
+
+    <!-- Messaging Modal -->
+    <div id="message-modal" class="simple-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title-premium">Quick Response</h3>
+                <button class="modal-close" onclick="closeModal('message-modal')">×</button>
+            </div>
+
+            <div class="default-msgs-container">
+                <button class="default-msg-pill" onclick="sendDefaultMsg('I\'ll call you back.')">I'll call you
+                    back.</button>
+                <button class="default-msg-pill" onclick="sendDefaultMsg('Can\'t talk right now.')">Can't talk right
+                    now.</button>
+                <button class="default-msg-pill" onclick="sendDefaultMsg('I\'m in a meeting.')">I'm in a
+                    meeting.</button>
+                <button class="default-msg-pill" onclick="sendDefaultMsg('Call you later?')">Call you later?</button>
+            </div>
+
+            <input type="text" class="custom-input-premium" placeholder="Type custom message..." id="quick-msg-input">
+            <button class="btn-luxury" style="width: 100%; height: 54px; font-size: 1.1rem;" onclick="sendQuickMsg()">
+                Send Message
+            </button>
+        </div>
+    </div>
+
+    <!-- Message Toast (System) -->
+    <div id="message-toast" class="premium-toast">
+        <div class="toast-icon"><i class="fa-solid fa-comment-dots"></i></div>
+        <div class="toast-content">
+            <h5 id="toast-from">Message</h5>
+            <p id="toast-text"></p>
+        </div>
+    </div>
+
+    <!-- Keypad Overlay (In-Call) -->
+    <div id="keypad-modal" class="simple-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Keypad</h3>
+                <button class="modal-close" onclick="closeModal('keypad-modal')">×</button>
+            </div>
+            <div class="keypad-grid">
+                <button class="keypad-btn">1</button><button class="keypad-btn">2</button><button
+                    class="keypad-btn">3</button>
+                <button class="keypad-btn">4</button><button class="keypad-btn">5</button><button
+                    class="keypad-btn">6</button>
+                <button class="keypad-btn">7</button><button class="keypad-btn">8</button><button
+                    class="keypad-btn">9</button>
+                <button class="keypad-btn">*</button><button class="keypad-btn">0</button><button
+                    class="keypad-btn">#</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="dialtone" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3" loop></audio>
+    <audio id="ringtone" src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" loop></audio>
+    <audio id="localAudio" autoplay muted style="display:none"></audio>
+    <audio id="remoteAudio" autoplay style="display:none"></audio>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="app.js"></script>

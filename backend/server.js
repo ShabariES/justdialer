@@ -192,6 +192,14 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('send-message', async ({ toRollNo, message }) => {
+        console.log(`Message from ${socket.rollno} to ${toRollNo}: ${message}`);
+        const socketId = await findSocketByRollNo(toRollNo);
+        if (socketId) {
+            io.to(socketId).emit('incoming-message', { fromRollNo: socket.rollno, message });
+        }
+    });
+
     socket.on('disconnect', async () => {
         if (socket.rollno) {
             console.log('User disconnected:', socket.rollno);

@@ -6,6 +6,7 @@ let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 let currentTargetRollNo = null;
 let onlineUsers = [];
 let deferredPrompt;
+let isMuted = false;
 
 // DOM Elements
 const loginSection = document.getElementById('login-section');
@@ -31,6 +32,24 @@ if (installBtn) {
             installBanner.classList.add('hidden');
         }
     });
+}
+
+// --- Keypad Audio ---
+function playKeypadBeep() {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+
+    oscillator.start();
+    gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.1);
+    oscillator.stop(audioCtx.currentTime + 0.1);
 }
 
 // --- Navigation Logic ---
@@ -146,8 +165,13 @@ function initDashboard() {
         startWebRTCConnection(currentTargetRollNo, true);
         startCallTimer();
     });
-    socket.on('call-rejected', () => { document.getElementById('dialtone')?.pause(); alert('Rejected'); closeCallScreen(); });
-    socket.on('call-failed', ({ message }) => { alert(message); closeCallScreen(); });
+    socket.on('call-rejected', () => {
+        document.getElementById('dialtone')?.pause();
+        showToast('Call Declined', 'User is busy right now');
+        setTimeout(closeCallScreen, 2000);
+    });
+    socket.on('call-failed', ({ message }) => { showToast('Call Failed', message); closeCallScreen(); });
+    socket.on('incoming-message', ({ fromRollNo, message }) => showToast(`Message from ${fromRollNo}`, message));
     socket.on('offer', ({ offer, fromRollNo }) => window.handleOffer?.(offer, fromRollNo));
     socket.on('answer', ({ answer }) => window.handleAnswer?.(answer));
     socket.on('ice-candidate', ({ candidate }) => window.handleIceCandidate?.(candidate));
@@ -218,12 +242,14 @@ function handleIncomingCall(fromRollNo) {
 async function acceptCall() {
     incomingPopup?.classList.add('hidden');
     document.getElementById('ringtone')?.pause();
+    const name = document.getElementById('incoming-name')?.innerText || currentTargetRollNo;
+
     if (!document.getElementById('call-screen')) {
         localStorage.setItem('acceptCallFrom', currentTargetRollNo);
         window.location.href = 'dialer.html';
         return;
     }
-    showCallScreen(currentTargetRollNo, 'Connecting...');
+    showCallScreen(name, 'Connecting...');
     socket.emit('accept-call', { toRollNo: currentTargetRollNo });
     await startWebRTCConnection(currentTargetRollNo, false);
     startCallTimer();
@@ -253,16 +279,7 @@ function closeCallScreen() {
     stopCallTimer();
 }
 
-// --- Call Controls ---
-let isMuted = false;
-document.getElementById('mute-btn')?.addEventListener('click', (e) => {
-    isMuted = !isMuted;
-    const btn = e.currentTarget;
-    btn.style.backgroundColor = isMuted ? 'white' : '';
-    btn.style.color = isMuted ? 'black' : '';
-    if (window.localStream) window.localStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
-});
-
+// --- Call Timer ---
 let callTimerInterval;
 function startCallTimer() {
     stopCallTimer();
@@ -276,13 +293,139 @@ function startCallTimer() {
 }
 function stopCallTimer() { clearInterval(callTimerInterval); }
 
+// --- Modal & Overlay Controls ---
+function openModal(id) { document.getElementById(id)?.classList.add('active'); }
+function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
+
+window.openModal = openModal;
+window.closeModal = closeModal;
+
+function sendDefaultMsg(text) {
+    if (!currentTargetRollNo) return;
+    socket.emit('send-message', { toRollNo: currentTargetRollNo, message: text });
+    closeModal('message-modal');
+    rejectCall();
+}
+window.sendDefaultMsg = sendDefaultMsg;
+
+function sendQuickMsg() {
+    const input = document.getElementById('quick-msg-input');
+    const msg = input.value.trim();
+    if (!msg || !currentTargetRollNo) return;
+    socket.emit('send-message', { toRollNo: currentTargetRollNo, message: msg });
+    closeModal('message-modal');
+    input.value = '';
+    rejectCall();
+}
+window.sendQuickMsg = sendQuickMsg;
+
+function showToast(title, text) {
+    const toast = document.getElementById('message-toast');
+    if (!toast) return;
+    document.getElementById('toast-from').innerText = title;
+    document.getElementById('toast-text').innerText = text;
+    toast.classList.add('active');
+    setTimeout(() => toast.classList.remove('active'), 5000);
+}
+window.showToast = showToast;
+
+// --- Slide-to-Action Logic ---
+function initSlideToTalk() {
+    const handle = document.getElementById('slide-handle');
+    const pill = document.getElementById('slide-pill');
+    if (!handle || !pill) return;
+
+    let isDragging = false;
+    let startX = 0;
+    let currentX = 0;
+    const threshold = 100; // Pixels to slide for action
+
+    handle.onpointerdown = (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        handle.setPointerCapture(e.pointerId);
+    };
+
+    handle.onpointermove = (e) => {
+        if (!isDragging) return;
+        currentX = e.clientX - startX;
+
+        // Limit movement
+        if (currentX > 120) currentX = 120;
+        if (currentX < -120) currentX = -120;
+
+        handle.style.transform = `translateX(${currentX}px)`;
+
+        // Optional: Opacity for labels
+        const leftLabel = pill.querySelector('.pill-label-left');
+        const rightLabel = pill.querySelector('.pill-label-right');
+        if (leftLabel) leftLabel.style.opacity = currentX < -20 ? '1' : '0.5';
+        if (rightLabel) rightLabel.style.opacity = currentX > 20 ? '1' : '0.5';
+    };
+
+    handle.onpointerup = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        handle.releasePointerCapture(e.pointerId);
+
+        if (currentX >= threshold) {
+            acceptCall();
+        } else if (currentX <= -threshold) {
+            rejectCall();
+        }
+
+        // Reset position
+        handle.style.transform = 'translateX(0px)';
+        const labels = pill.querySelectorAll('.pill-side-label');
+        labels.forEach(l => l.style.opacity = '0.5');
+        currentX = 0;
+    };
+}
+
+// --- Call Controls ---
+let isSpeakerOn = false;
+function toggleSpeaker(e) {
+    isSpeakerOn = !isSpeakerOn;
+    const btn = e.currentTarget;
+    btn.classList.toggle('active', isSpeakerOn);
+}
+
 // Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    initSlideToTalk();
+    document.querySelector('.msg-pill-btn')?.addEventListener('click', () => openModal('message-modal'));
+    document.getElementById('speaker-btn')?.addEventListener('click', toggleSpeaker);
+    document.getElementById('keypad-btn')?.addEventListener('click', () => openModal('keypad-modal'));
+    document.getElementById('more-btn')?.addEventListener('click', () => alert('More options: Add Call, Hold, Record Coming Soon!'));
+
+    // Keypad Beeps
+    document.querySelectorAll('.keypad-btn').forEach(btn => {
+        btn.addEventListener('click', playKeypadBeep);
+    });
+
+    // Mute toggle update
+    document.getElementById('mute-btn')?.addEventListener('click', (e) => {
+        isMuted = !isMuted;
+        const btn = e.currentTarget;
+        btn.classList.toggle('active', isMuted);
+        if (window.localStream) window.localStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
+    });
+});
+
 if (document.getElementById('login-btn')) document.getElementById('login-btn').onclick = login;
 if (document.getElementById('register-btn')) document.getElementById('register-btn').onclick = register;
 if (document.getElementById('call-btn')) document.getElementById('call-btn').onclick = startCall;
-if (document.getElementById('accept-call-btn')) document.getElementById('accept-call-btn').onclick = acceptCall;
-if (document.getElementById('reject-call-btn')) document.getElementById('reject-call-btn').onclick = rejectCall;
 document.getElementById('end-call-btn')?.addEventListener('click', () => {
     if (currentTargetRollNo) socket.emit('end-call', { toRollNo: currentTargetRollNo });
     closeCallScreen();
 });
+
+// Re-init slide to talk if incoming call popup is shown
+const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class' && !mutation.target.classList.contains('hidden')) {
+            initSlideToTalk();
+        }
+    });
+});
+if (incomingPopup) observer.observe(incomingPopup, { attributes: true });
